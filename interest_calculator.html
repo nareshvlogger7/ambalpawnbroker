@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interest Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input[type="number"], input[type="date"], input[type="submit"], button {
+            padding: 10px;
+            font-size: 1rem;
+            margin-top: 5px;
+        }
+        .radio-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        .result {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .btn-group input, .btn-group button {
+            flex: 1;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Interest Calculator</h1>
+        <form id="interestForm">
+            <label for="fromDate">From date:</label>
+            <input type="date" id="fromDate" name="fromDate" required>
+            <label for="toDate">To date:</label>
+            <input type="date" id="toDate" name="toDate" required>
+
+            <div class="radio-group">
+                <label><input type="radio" name="interestType" value="simple" checked> Simple Interest</label>
+                <label><input type="radio" name="interestType" value="compound"> Compound Interest</label>
+            </div>
+
+            <div class="radio-group">
+                <label><input type="radio" name="frequency" value="monthly" checked> Monthly</label>
+                <label><input type="radio" name="frequency" value="yearly"> Yearly</label>
+            </div>
+
+            <label for="principal">Principal Amount:</label>
+            <input type="number" id="principal" name="principal" step="0.01" required>
+            
+            <label for="rate">Interest Rate (%):</label>
+            <input type="number" id="rate" name="rate" step="0.01" required>
+            
+            <div class="btn-group">
+                <button type="reset">Reset</button>
+                <input type="button" value="Calculate" onclick="calculateInterest()">
+            </div>
+        </form>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function calculateInterest() {
+            const fromDate = new Date(document.getElementById('fromDate').value);
+            const toDate = new Date(document.getElementById('toDate').value);
+            const interestType = document.querySelector('input[name="interestType"]:checked').value;
+            const frequency = document.querySelector('input[name="frequency"]:checked').value;
+            const principal = parseFloat(document.getElementById('principal').value);
+            const rate = parseFloat(document.getElementById('rate').value);
+
+            if (!fromDate || !toDate || isNaN(principal) || isNaN(rate) || fromDate > toDate) {
+                document.getElementById('result').innerHTML = "Please fill all the fields correctly.";
+                return;
+            }
+
+            const timeDifference = toDate.getTime() - fromDate.getTime();
+            const days = timeDifference / (1000 * 3600 * 24);
+            let timePeriod;
+            if (frequency === 'monthly') {
+                timePeriod = days / 30;
+            } else {
+                timePeriod = days / 365;
+            }
+
+            let interest;
+            if (interestType === 'simple') {
+                interest = (principal * rate * timePeriod) / 100;
+            } else {
+                const compoundFrequency = frequency === 'monthly' ? 12 : 1;
+                interest = principal * (Math.pow((1 + (rate / (100 * compoundFrequency))), compoundFrequency * timePeriod) - 1);
+            }
+
+            document.getElementById('result').innerHTML = `<h2>Calculated Interest: ₹${interest.toFixed(2)}</h2>`;
+        }
+    </script>
+</body>
+</html>
